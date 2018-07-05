@@ -44,10 +44,6 @@ import static android.hardware.Sensor.TYPE_GYROSCOPE;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
-    //For calibrating accelerometer
-    private float last_x, last_y, last_z;
-    private long lastUpdate = 0;
-    private static final int SHAKE_THRESHOLD = 25;
     private String buttonPressed = "N/A";
 
     //For handling external storage permissions
@@ -110,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         timer = (Chronometer) findViewById(R.id.timer);
         timer.setBase(SystemClock.elapsedRealtime());
         timer.start();
-
-        //Initialize data array with column labels. Does NOT include gyro data as of yet.
-        data.add(columnLabels);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED )
         {
@@ -243,26 +236,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             aY = sensorEvent.values[1];
             aZ = sensorEvent.values[2];
 
-            if ((curTime - lastUpdate) > 15)
-            {
-                long diffTime = (curTime - lastUpdate);
-                lastUpdate = curTime;
-                AccelTime = curTime;
+            AccelTime = curTime;
 
-                float speed = Math.abs(aX + aY + aZ - last_x - last_y - last_z)/ diffTime * 10000;
+            accelX = String.valueOf(aX);
+            accelY = String.valueOf(aY);
+            accelZ = String.valueOf(aZ);
 
-                if (speed > SHAKE_THRESHOLD)
-                {
-                    accelX = String.valueOf(aX);
-                    accelY = String.valueOf(aY);
-                    accelZ = String.valueOf(aZ);
-
-                }
-
-                last_x = aX;
-                last_y = aY;
-                last_z = aZ;
-            }
         }
 
         if (mySensor.getType() == Sensor.TYPE_GYROSCOPE)
@@ -281,8 +260,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             {
 
                 data.add(new String[]{this.buttonPressed, String.valueOf(millisec), accelX, accelY, accelZ, gyroX, gyroY, gyroZ});
-                //System.out.println("Data added: " + this.buttonPressed + ", " + millisec);
                 writer.writeAll(data);
+                data.clear();
             }
 
         }
