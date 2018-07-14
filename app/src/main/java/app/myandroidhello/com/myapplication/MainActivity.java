@@ -50,11 +50,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private int requestCode;
     private int grantResults[];
 
+    //For labeling multiple sensorEvent instances during individual button presses as one unique event. Used when converting to MLI format in Weka.
+    private int instanceID = 0;
+
     //Array of string[] to be added to the csv file row by row
     List<String[]> data = new ArrayList<String[]>();
 
     //Default column labels for CSV file.
-    String[] columnLabels = "Button#Time#aX#aY#aZ#gX#gY#gZ".split("#");
+    String[] columnLabels = "Instance#Button#Time#aX#aY#aZ#gX#gY#gZ".split("#");
 
     //Data to be written to CSV file
     float aX;
@@ -180,7 +183,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int y = Math.round(event.getY());
 
         // MotionEvent object holds X-Y values
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN)
+        {
+            this.instanceID = this.instanceID + 1;
             try {
                 if (buttonView.button1.contains(x, y)) {
                     this.buttonPressed = "1";
@@ -218,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             this.buttonPressed = "N/A";
+            this.instanceID = this.instanceID + 1;
         }
         return super.onTouchEvent(event);
     }
@@ -259,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (AccelTime == GyroTime)
             {
 
-                data.add(new String[]{this.buttonPressed, String.valueOf(millisec), accelX, accelY, accelZ, gyroX, gyroY, gyroZ});
+                data.add(new String[]{String.valueOf(this.instanceID), this.buttonPressed, String.valueOf(millisec), accelX, accelY, accelZ, gyroX, gyroY, gyroZ});
                 writer.writeAll(data);
                 data.clear();
             }
