@@ -24,8 +24,6 @@ public class ButtonView extends View
     public Rect button9;
     public Rect button0;
     public Rect buttonSubmit;
-    public Rect buttonStar;
-    public Rect buttonHash;
 
     private Paint paint1;
     private Paint paint2;
