@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (AccelTime == GyroTime)
             {
 
-                data.add(new String[]{String.valueOf(this.instanceID), this.buttonPressed, String.valueOf(millisec), accelX, accelY, accelZ, gyroX, gyroY, gyroZ});
+                data.add(new String[]{"press" + String.valueOf(this.instanceID), this.buttonPressed, String.valueOf(millisec), accelX, accelY, accelZ, gyroX, gyroY, gyroZ});
                 writer.writeAll(data);
                 data.clear();
             }
