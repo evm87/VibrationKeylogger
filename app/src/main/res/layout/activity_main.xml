@@ -10,6 +10,7 @@
         android:id="@+id/buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         />
 
     <Chronometer
@@ -17,5 +18,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttons" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:id ="@+id/txt"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:layout_centerHorizontal="true" />
+
+
 
 </RelativeLayout>

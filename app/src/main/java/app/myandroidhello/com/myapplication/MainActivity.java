@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.hardware.Sensor;
 import android.widget.Chronometer;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.opencsv.CSVWriter;
@@ -46,6 +47,8 @@ import static org.apache.commons.math3.transform.DftNormalization.STANDARD;
 public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
     private String buttonPressed = "N/A";
+    private int mCounter = 0;
+    TextView txV;
 
     //For handling external storage permissions
     private int requestCode;
@@ -114,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        txV = (TextView) findViewById(R.id.txt);
 
         buttonView = (ButtonView) findViewById(R.id.buttons);
         buttonView.setMainActivity(this);
@@ -200,33 +205,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             try {
                 if (buttonView.button1.contains(x, y)) {
                     this.buttonPressed = "1";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button2.contains(x, y)) {
                     this.buttonPressed = "2";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button3.contains(x, y)) {
                     this.buttonPressed = "3";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button4.contains(x, y)) {
                     this.buttonPressed = "4";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button5.contains(x, y)) {
                     this.buttonPressed = "5";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button6.contains(x, y)) {
                     this.buttonPressed = "6";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button7.contains(x, y)) {
                     this.buttonPressed = "7";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button8.contains(x, y)) {
                     this.buttonPressed = "8";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button9.contains(x, y)) {
                     this.buttonPressed = "9";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.button0.contains(x, y)) {
                     this.buttonPressed = "0";
+                    incCounter();
                     //System.out.println("Press detected.........press #" + this.instanceID + ", " + buttonPressed);
                 } else if (buttonView.buttonSubmit.contains(x, y)) {
                     sensorManager.unregisterListener(MainActivity.this, accelerometer);
@@ -696,6 +711,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return length;
         }
         return highestOneBit << 1;
+    }
+
+    public void incCounter()
+    {
+        mCounter++;
+        if (mCounter == 40)
+        {
+            mCounter = 0;
+        }
+        txV.setText(Integer.toString(mCounter));
     }
 
 }
