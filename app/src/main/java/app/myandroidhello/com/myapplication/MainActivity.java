@@ -7,27 +7,16 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.SystemClock;
-import android.os.Vibrator;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.hardware.Sensor;
 import android.widget.Chronometer;
-import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.opencsv.CSVWriter;
@@ -35,12 +24,7 @@ import com.opencsv.CSVWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static android.hardware.Sensor.TYPE_GYROSCOPE;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
@@ -89,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Chronometer timer;
     long millisec;
 
-    String csv = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/data.csv";
+    String csv = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/rawData.csv";
     CSVWriter writer;
 
     public MainActivity()
@@ -117,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             onRequestPermissionsResult(requestCode, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, grantResults);
         }
 
-/*Uncomment out and figure our IOException cause later*/
         try
         {
             if (isExternalStorageWritable())
@@ -138,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             } else {
                 System.out.println("External storage not available!");
             }
-/*Uncomment out when ready to figure out IOException*/
         }
         catch (IOException e)
         {
@@ -156,7 +138,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-    @Override // android recommended class to handle permissions
+    @Override
+    /**
+     * Android recommended class to handle permissions
+     */
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 1: {
@@ -166,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 {
                     Log.d("permission", "granted");
                 } else {
-                    //Permission denied. Disable the functionality that depends on this permission.
                     Toast.makeText(MainActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
 
                     //App cannot function without this permission for now so close it
@@ -177,12 +161,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    /**
+     * Runs every time a user taps the screen
+     */
     public boolean onTouchEvent(MotionEvent event)
     {
         int x = Math.round(event.getX());
         int y = Math.round(event.getY());
 
-        // MotionEvent object holds X-Y values
+        // MotionEvent object holds X-Y values. This section runs the moment a finger touches the screen.
         if(event.getAction() == MotionEvent.ACTION_DOWN)
         {
             this.instanceID = this.instanceID + 1;
@@ -216,10 +203,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             catch (Exception e)
             {
+                //If a file cannot be written to, the user is notified.
                 Toast.makeText(MainActivity.this, "File Not Written", Toast.LENGTH_SHORT).show();
             }
         }
 
+        //Runs when a user removes a finger from the screen
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             this.buttonPressed = "N/A";
@@ -228,6 +217,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return super.onTouchEvent(event);
     }
 
+    /**
+     * Runs every time a sensor detects movement
+     * @param sensorEvent
+     */
     public void onSensorChanged(SensorEvent sensorEvent)
     {
         Sensor mySensor = sensorEvent.sensor;
@@ -262,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             gyroY = String.valueOf(gY);
             gyroZ = String.valueOf(gZ);
 
+            //To prevent double entries in the CSV file, data is only recorded during the gyroscope logic after the accelerometer data is stored
             if (AccelTime == GyroTime)
             {
 
@@ -284,12 +278,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
     }
 
+    /**
+     * Unregister the sensor listeners if the app is paused
+     */
     protected void onPause()
     {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 
+    /**
+     * Unreegister the listeners if the app is stopped
+     */
     protected void onStop()
     {
         super.onStop();
@@ -301,7 +301,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onDestroy();
     }
 
-    /* Checks if external storage is available for read and write */
+    /**
+     *  Checks if external storage is available for read and write
+     *  */
     public boolean isExternalStorageWritable()
     {
         String state = Environment.getExternalStorageState();
