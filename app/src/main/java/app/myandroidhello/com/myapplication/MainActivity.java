@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Chronometer timer;
     long millisec;
 
-    String csv = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/data.csv";
+    String csv = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/featureData.csv";
     CSVWriter writer;
 
     public MainActivity()
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-    @Override // android recommended class to handle permissions
+    @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 1: {
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 {
                     Log.d("permission", "granted");
                 } else {
-                    //Permission denied. Disable the functionality that depends on this permission.
+                    //Confirm to user that permission is denied. Disable the functionality that depends on this permission.
                     Toast.makeText(MainActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
 
                     //App cannot function without this permission for now so close it
@@ -193,12 +193,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    /**
+     * This method runs every time the screen is tapped.
+     */
     public boolean onTouchEvent(MotionEvent event)
     {
         int x = Math.round(event.getX());
         int y = Math.round(event.getY());
 
-        // MotionEvent object holds X-Y values
+        //MotionEvent object holds X-Y values. This part runs when the finger touches the screen.
         if(event.getAction() == MotionEvent.ACTION_DOWN)
         {
             this.instanceID = this.instanceID + 1;
@@ -252,10 +255,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             catch (Exception e)
             {
+                //If file cannot be written,display this message
                 Toast.makeText(MainActivity.this, "File Not Written", Toast.LENGTH_SHORT).show();
             }
         }
 
+        //This section runs when the user removes the finger from the screen
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             //Create mean of all accel and gyro data and convert to strings
@@ -331,6 +336,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return super.onTouchEvent(event);
     }
 
+    /**
+     * Runs every time a sensor detects movement.
+     * @param sensorEvent
+     */
     public void onSensorChanged(SensorEvent sensorEvent)
     {
         Sensor mySensor = sensorEvent.sensor;
@@ -347,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             AccelTime = curTime;
 
+            //Only record data is the movement is associated with a button
             if(!buttonPressed.equals("N/A"));
             {
                 accelX = (double)aX;
@@ -367,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             gY = sensorEvent.values[1];
             gZ = sensorEvent.values[2];
 
+            //Only record data is the movement is associated with a button
             if(!buttonPressed.equals("N/A"));
             {
                 gyroX = (double)gX;
@@ -378,12 +389,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 allGZ.add(gyroZ);
             }
 
-            if (AccelTime == GyroTime)
-            {
-
-            }
-
         }
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i)
+    {
 
     }
 
@@ -397,12 +409,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
     }
 
+    /**
+     * Unregister the sensor listeners if the app is paused
+     */
     protected void onPause()
     {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 
+    /**
+     * Unregister the sensor listeners if the app is stopped
+     */
     protected void onStop()
     {
         super.onStop();
@@ -414,7 +432,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onDestroy();
     }
 
-    /* Checks if external storage is available for read and write */
+    /**
+     *  Checks if external storage is available for read and write
+     */
     public boolean isExternalStorageWritable()
     {
         String state = Environment.getExternalStorageState();
@@ -430,20 +450,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onAccuracyChanged(Sensor sensor, int accuracy)
-    {
-
     }
 
     @Override
@@ -455,8 +468,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    /**
+     * Hides the upper options bar for more screen area
+     */
     private void hideSystemUI() {
-        // Enables regular immersive mode.
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE
@@ -713,6 +728,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return highestOneBit << 1;
     }
 
+    /**
+     * Increments the counter for keeping track of button presses when collected 40x training sets. Resets to 0 once 40 is reached.
+     */
     public void incCounter()
     {
         mCounter++;
